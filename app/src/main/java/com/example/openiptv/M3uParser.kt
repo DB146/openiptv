@@ -7,6 +7,7 @@ object M3uParser {
         var name: String? = null
         var ua: String? = null
         var ref: String? = null
+        var key: String? = null
         for (raw in text.lineSequence()) {
             val line = raw.trim()
             if (line.isEmpty()) continue
@@ -15,12 +16,13 @@ object M3uParser {
                 low.startsWith("#extinf") -> name = line.substringAfterLast(',', line).trim()
                 low.startsWith("#extvlcopt:http-user-agent=") -> ua = line.substringAfter('=').trim()
                 low.startsWith("#extvlcopt:http-referrer=") -> ref = line.substringAfter('=').trim()
+                low.startsWith("#kodiprop:inputstream.adaptive.license_key=") -> key = line.substringAfter('=').trim()
                 line.startsWith("#") -> {}
                 else -> {
                     if (name != null && (low.startsWith("http://") || low.startsWith("https://"))) {
-                        out.add(Channel(out.size + 1, name, line, ua, ref))
+                        out.add(Channel(out.size + 1, name, line, ua, ref, key))
                     }
-                    name = null; ua = null; ref = null
+                    name = null; ua = null; ref = null; key = null
                 }
             }
         }
