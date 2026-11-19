@@ -1,12 +1,12 @@
 package com.example.openiptv
 
+/** [number] is assigned automatically: 1..N in playlist order. */
 data class Channel(
+    val number: Int,
     val name: String,
     val url: String,
-    val group: String? = null,
-    val logo: String? = null,
     val userAgent: String? = null,
     val referer: String? = null,
 ) {
-    override fun toString() = if (group.isNullOrBlank()) name else "$name  [$group]"
+    override fun toString() = "$number   $name"
 }
