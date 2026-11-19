@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import android.widget.GridView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -141,14 +142,23 @@ class PlayerActivity : Activity() {
             .setUserAgent(ch.userAgent ?: "Mozilla/5.0")
             .setAllowCrossProtocolRedirects(true)
         ch.referer?.let { http.setDefaultRequestProperties(mapOf("Referer" to it)) }
-        val p = ExoPlayer.Builder(this).setMediaSourceFactory(DefaultMediaSourceFactory(http)).build()
+        val msf = DefaultMediaSourceFactory(http)
+        ch.clearKey?.let { spec ->
+            val drm = ClearKey.sessionManager(spec)
+            if (drm != null) msf.setDrmSessionManagerProvider { drm }
+            else Toast.makeText(this, "Invalid ClearKey for ${ch.name}", Toast.LENGTH_SHORT).show()
+        }
+        val p = ExoPlayer.Builder(this).setMediaSourceFactory(msf).build()
         p.setVideoSurfaceView(surface)
         p.addListener(object : Player.Listener {
             override fun onPlayerError(e: PlaybackException) {
                 Toast.makeText(this@PlayerActivity, "Playback error: ${e.errorCodeName}", Toast.LENGTH_SHORT).show()
             }
         })
-        p.setMediaItem(MediaItem.fromUri(ch.url)); p.prepare(); p.playWhenReady = true
+        val item = MediaItem.Builder().setUri(ch.url).apply {
+            if (ch.clearKey != null) setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.CLEARKEY_UUID).build())
+        }.build()
+        p.setMediaItem(item); p.prepare(); p.playWhenReady = true
         player = p
         showChannel(ch)
     }
