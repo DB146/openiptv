@@ -9,7 +9,8 @@ import android.view.KeyEvent
 import android.view.SurfaceView
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.ListView
+import android.widget.FrameLayout
+import android.widget.GridView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.media3.common.MediaItem
@@ -25,9 +26,10 @@ import kotlin.concurrent.thread
  *  - launched normally            -> last channel (or #1)
  *  - action com.example.openiptv.PLAY, extra "number" (int) or "name"/"query" (string)
  *  - deep link openiptv://channel/<number|name>
- * Remote: Up/Down or CH+/CH- change channel, digits type a number, OK opens the list.
+ * Remote: Up/Down or CH+/CH- change channel, digits type a number, Left (or OK) opens the channel grid.
  */
 class PlayerActivity : Activity() {
+    private companion object { const val COLUMNS = 3 }
     private var player: ExoPlayer? = null
     private var current: Channel? = null
     private var request: Intent? = null
@@ -38,7 +40,7 @@ class PlayerActivity : Activity() {
     private lateinit var surface: SurfaceView
     private lateinit var title: TextView
     private lateinit var entry: TextView
-    private lateinit var overlay: ListView
+    private lateinit var overlay: GridView
 
     private val hideTitle = Runnable { title.visibility = View.GONE }
     private val commitTyped = Runnable { commitNumber() }
@@ -48,8 +50,12 @@ class PlayerActivity : Activity() {
         setContentView(R.layout.activity_player)
         surface = findViewById(R.id.surface); title = findViewById(R.id.title)
         entry = findViewById(R.id.entry); overlay = findViewById(R.id.overlayList)
+        // Channel menu: left half of the screen, 3 channels per row (1 2 3 / 4 5 6 / ...).
+        overlay.layoutParams = (overlay.layoutParams as FrameLayout.LayoutParams).apply {
+            width = resources.displayMetrics.widthPixels / 2
+        }
         overlay.setOnItemClickListener { _, _, pos, _ ->
-            overlay.visibility = View.GONE
+            closeMenu()
             Playlist.channels.getOrNull(pos)?.let { play(it) }
         }
         request = intent
@@ -89,8 +95,16 @@ class PlayerActivity : Activity() {
     }
 
     private fun fillList() {
-        overlay.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, Playlist.channels)
+        overlay.adapter = ArrayAdapter(this, R.layout.item_channel, R.id.text, Playlist.channels)
     }
+
+    private fun openMenu() {
+        overlay.visibility = View.VISIBLE
+        overlay.requestFocus()
+        overlay.setSelection(Playlist.channels.indexOf(current).coerceAtLeast(0))
+    }
+
+    private fun closeMenu() { overlay.visibility = View.GONE }
 
     // ---- choosing what to play -------------------------------------------------
 
@@ -166,7 +180,11 @@ class PlayerActivity : Activity() {
         if (e.action == KeyEvent.ACTION_DOWN) {
             val k = e.keyCode
             if (overlay.visibility == View.VISIBLE) {
-                if (k == KeyEvent.KEYCODE_BACK) { overlay.visibility = View.GONE; return true }
+                // Back, or Right from the last column, closes the menu.
+                if (k == KeyEvent.KEYCODE_BACK ||
+                    (k == KeyEvent.KEYCODE_DPAD_RIGHT && overlay.selectedItemPosition % COLUMNS == COLUMNS - 1)) {
+                    closeMenu(); return true
+                }
                 return super.dispatchKeyEvent(e)
             }
             when {
@@ -180,10 +198,8 @@ class PlayerActivity : Activity() {
                 typed.isNotEmpty() && (k == KeyEvent.KEYCODE_DPAD_CENTER || k == KeyEvent.KEYCODE_ENTER) -> { commitNumber(); return true }
                 k == KeyEvent.KEYCODE_DPAD_UP || k == KeyEvent.KEYCODE_CHANNEL_UP -> { step(-1); return true }
                 k == KeyEvent.KEYCODE_DPAD_DOWN || k == KeyEvent.KEYCODE_CHANNEL_DOWN -> { step(1); return true }
-                k == KeyEvent.KEYCODE_DPAD_CENTER || k == KeyEvent.KEYCODE_ENTER -> {
-                    overlay.visibility = View.VISIBLE
-                    overlay.setSelection(Playlist.channels.indexOf(current).coerceAtLeast(0))
-                    overlay.requestFocus(); return true
+                k == KeyEvent.KEYCODE_DPAD_LEFT || k == KeyEvent.KEYCODE_DPAD_CENTER || k == KeyEvent.KEYCODE_ENTER -> {
+                    openMenu(); return true
                 }
             }
         }
