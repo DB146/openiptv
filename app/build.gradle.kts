@@ -5,7 +5,7 @@ plugins {
 
 // The playlist URL is fixed at build time. Set it with (first match wins):
 //   -PM3U_URL=...   |   env M3U_URL (GitHub: Settings > Secrets and variables > Actions > Variables)   |   DEFAULT_M3U below
-val DEFAULT_M3U = ""
+val DEFAULT_M3U = "https://iptv-org.github.io/iptv/countries/vn.m3u"
 val m3uUrl: String = providers.gradleProperty("M3U_URL")
     .orElse(providers.environmentVariable("M3U_URL"))
     .orElse(DEFAULT_M3U).get().trim()
