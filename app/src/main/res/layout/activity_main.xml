@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="24dp" android:background="#121212">
+    <EditText android:id="@+id/urlInput" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="M3U playlist URL (http/https)" android:inputType="textUri"
+        android:textColor="#FFF" android:textColorHint="#888" android:imeOptions="actionDone"/>
+    <Button android:id="@+id/loadButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Load playlist"/>
+    <TextView android:id="@+id/status" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textColor="#BBB" android:paddingTop="8dp" android:paddingBottom="8dp"/>
+    <ListView android:id="@+id/channelList" android:layout_width="match_parent" android:layout_height="match_parent"/>
+</LinearLayout>
