@@ -25,3 +25,17 @@ jobs:
         with:
           name: OpenIptv-apk
           path: app/build/outputs/apk/release/*.apk
+      # One permanent release, tag "latest", always pointing at the newest build of main.
+      # Stable link: https://github.com/<owner>/<repo>/releases/download/latest/OpenIptv.apk
+      - name: Publish to the "latest" release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/release/*.apk OpenIptv.apk
+          git tag -f latest
+          git push -f origin refs/tags/latest
+          gh release view latest >/dev/null 2>&1 || \
+            gh release create latest --verify-tag --latest --title "Latest" --notes "Newest build of main."
+          gh release edit latest --notes "Built from ${GITHUB_SHA::7}" --latest
+          gh release upload latest OpenIptv.apk --clobber
