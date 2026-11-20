@@ -45,3 +45,13 @@ class UrlPolicyTest {
         } finally { s.stop(0) }
     }
 }
+
+class HttpModeTest {
+    @Test fun parsesModesWithFallbackAsTheDefault() {
+        assertEquals(HttpMode.FALLBACK, HttpMode.parse(null))
+        assertEquals(HttpMode.FALLBACK, HttpMode.parse("fallback"))
+        assertEquals(HttpMode.FALLBACK, HttpMode.parse("garbage"))
+        assertEquals(HttpMode.STRICT, HttpMode.parse(" Strict "))
+        assertEquals(HttpMode.FORCE, HttpMode.parse("FORCE"))
+    }
+}

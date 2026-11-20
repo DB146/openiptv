@@ -27,10 +27,14 @@ Minimal Android TV / phone IPTV player. Opens straight into a channel, no menus.
   entries with a bad URL are skipped and logged (logcat tag `OpenIPTV`, with the playlist line number).
   Redirects are followed, including http<->https (max 10, loops detected, every hop re-validated).
   TLS certificates and host names are always verified; a bad certificate is reported as a TLS error.
-- **Force http (on by default):** every `https://` *stream* URL (manifest, segments, keys, redirect targets) is rewritten to
-  `http://` (`:443` is dropped). This disables TLS for streams: traffic and tokens are readable on the network, and hosts that only
-  serve https will fail or redirect back to https. The playlist download is not affected. Turn it off with `-PFORCE_HTTP=false`
-  (or env `FORCE_HTTP=false`) when building.
+- **https / http mode (`HTTP_MODE`, default `fallback`):** build with `-PHTTP_MODE=strict|fallback|force` (or env `HTTP_MODE`).
+  - `fallback`: try `https://` first; if the secure connection itself fails (TLS/certificate error, connection refused,
+    timeout) retry the same URL over `http://`. HTTP status errors (403, 404...) never trigger it. A host that failed once
+    goes straight to http for the rest of that playback.
+  - `strict`: URLs exactly as written, no downgrade.
+  - `force`: rewrite every `https://` stream URL to `http://` up front (`:443` dropped).
+  Both `fallback` and `force` weaken TLS: anyone who can block port 443 can push a `fallback` request onto plain http, and
+  http traffic and tokens are readable on the network. The playlist download is never affected.
 - **Stream types:** HLS (`.m3u8`), DASH (`.mpd`), live PHP/TS endpoints (`...live.php?...&extension=ts`), and URLs with no
   extension. Type comes from `manifest_type`, then the path extension, then `extension=`; if still unknown, the first bytes
   of the response (Content-Type, `#EXTM3U`, `<MPD`, TS sync bytes) decide.

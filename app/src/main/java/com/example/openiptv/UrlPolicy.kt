@@ -1,10 +1,29 @@
 package com.example.openiptv
 
 /**
- * Optional "force http" mode (BuildConfig.FORCE_HTTP): every https:// URL is rewritten to http://.
- * This turns TLS off, so tokens, headers and the stream itself are readable on the network, and hosts
- * that only serve https will fail or redirect back to https. It exists for servers with broken certificates.
+ * http/https policy for stream URLs (BuildConfig.HTTP_MODE, see [HttpMode]).
+ * FORCE rewrites every https:// to http://. That turns TLS off, so tokens, headers and the stream are readable on the
+ * network, and https-only hosts fail or redirect back to https. FALLBACK only downgrades after https has failed, but
+ * anyone who can block port 443 can trigger that, so it is not a security boundary either.
  */
+/** How https stream URLs are treated. */
+enum class HttpMode {
+    /** Use URLs exactly as written. */
+    STRICT,
+    /** Try https; if the secure connection itself fails (TLS error, refused, timeout), retry the same URL over http. */
+    FALLBACK,
+    /** Rewrite every https:// to http:// up front. */
+    FORCE;
+
+    companion object {
+        fun parse(s: String?): HttpMode = when (s?.trim()?.lowercase()) {
+            "strict", "off", "false" -> STRICT
+            "force", "http", "true" -> FORCE
+            else -> FALLBACK
+        }
+    }
+}
+
 object UrlPolicy {
     /** https://host:443/x?y -> http://host/x?y. Other schemes and non-default ports are kept as they are. */
     fun downgrade(url: String): String {

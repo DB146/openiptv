@@ -11,8 +11,8 @@ object StreamProbe {
     private const val SNIFF_BYTES = 1024
 
     /** Blocking. Sends the channel's own headers (User-Agent, Referer) and validates every redirect hop. */
-    fun detect(url: String, headers: Map<String, String>, forceHttp: Boolean = false): Probe = try {
-        val r = HttpClient.fetch(url, headers, SNIFF_BYTES, sniff = true, forceHttp = forceHttp)
+    fun detect(url: String, headers: Map<String, String>, forceHttp: Boolean = false, fallbackToHttp: Boolean = false): Probe = try {
+        val r = HttpClient.fetch(url, headers, SNIFF_BYTES, sniff = true, forceHttp = forceHttp, fallbackToHttp = fallbackToHttp)
         Probe(classify(r.contentType, r.body))
     } catch (e: HttpError) {
         Probe(StreamType.UNKNOWN, e)

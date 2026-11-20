@@ -10,10 +10,11 @@ val m3uUrl: String = providers.gradleProperty("M3U_URL")
     .orElse(providers.environmentVariable("M3U_URL"))
     .orElse(DEFAULT_M3U).get().trim()
 
-// Rewrites every https:// stream URL to http:// (disables TLS for streams, not the playlist download; see UrlPolicy). Default on; turn off with -PFORCE_HTTP=false or env FORCE_HTTP=false.
-val forceHttp: Boolean = providers.gradleProperty("FORCE_HTTP")
-    .orElse(providers.environmentVariable("FORCE_HTTP"))
-    .orElse("true").get().trim().equals("true", ignoreCase = true)
+// How https stream URLs are treated (see HttpMode / UrlPolicy): strict | fallback | force. Default fallback.
+// Set with -PHTTP_MODE=... or env HTTP_MODE. The playlist download is never affected.
+val httpMode: String = providers.gradleProperty("HTTP_MODE")
+    .orElse(providers.environmentVariable("HTTP_MODE"))
+    .orElse("fallback").get().trim().lowercase().let { if (it in setOf("strict", "fallback", "force")) it else "fallback" }
 
 android {
     namespace = "com.example.openiptv"
@@ -24,7 +25,7 @@ android {
         targetSdk = 34
         versionCode = 2
         versionName = "2.0"
-        buildConfigField("boolean", "FORCE_HTTP", forceHttp.toString())
+        buildConfigField("String", "HTTP_MODE", "\"" + httpMode + "\"")
         buildConfigField("String", "M3U_URL", "\"" + m3uUrl.replace("\\", "\\\\").replace("\"", "\\\"") + "\"")
     }
     buildFeatures { buildConfig = true }

@@ -19,10 +19,12 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.thread
 
 /**
@@ -145,8 +147,9 @@ class PlayerActivity : Activity() {
         if (ch.streamType != StreamType.UNKNOWN) { startPlayback(ch, ch.streamType); return }
         // No extension, no manifest_type: ask the server what this URL is before handing it to ExoPlayer,
         // which would otherwise treat it as a plain file. Skipped if the user has already moved on.
+        val mode = HttpMode.parse(BuildConfig.HTTP_MODE)
         thread {
-            val probe = StreamProbe.detect(ch.url, ch.requestHeaders, BuildConfig.FORCE_HTTP)
+            val probe = StreamProbe.detect(ch.url, ch.requestHeaders, mode == HttpMode.FORCE, mode == HttpMode.FALLBACK)
             runOnUiThread {
                 if (isDestroyed || !started || current !== ch) return@runOnUiThread
                 val err = probe.error
@@ -170,10 +173,18 @@ class PlayerActivity : Activity() {
             .setAllowCrossProtocolRedirects(true) // http<->https hops; TLS certificates are still verified
             .setConnectTimeoutMs(10_000)
             .setReadTimeoutMs(15_000)
-        // Force-http mode: rewrite every request ExoPlayer makes for the stream (manifest, segments, keys). The playlist download is not affected.
-        val source = if (BuildConfig.FORCE_HTTP) {
-            ResolvingDataSource.Factory(http) { spec -> spec.withUri(Uri.parse(UrlPolicy.downgrade(spec.uri.toString()))) }
-        } else http
+        // HTTP_MODE: strict = as written; fallback = https first, http if the secure connection fails; force = always http.
+        // The playlist download is never affected.
+        val source: DataSource.Factory = when (HttpMode.parse(BuildConfig.HTTP_MODE)) {
+            HttpMode.FORCE -> ResolvingDataSource.Factory(http) { spec ->
+                spec.withUri(Uri.parse(UrlPolicy.downgrade(spec.uri.toString())))
+            }
+            HttpMode.FALLBACK -> {
+                val downgradedHosts = ConcurrentHashMap.newKeySet<String>() // hosts that failed over https during this playback
+                DataSource.Factory { FallbackDataSource(http, downgradedHosts) }
+            }
+            HttpMode.STRICT -> http
+        }
         val msf = DefaultMediaSourceFactory(source)
         var clearKey = false
         val keySpec = ch.licenseKey
