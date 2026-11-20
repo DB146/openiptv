@@ -27,6 +27,10 @@ Minimal Android TV / phone IPTV player. Opens straight into a channel, no menus.
   entries with a bad URL are skipped and logged (logcat tag `OpenIPTV`, with the playlist line number).
   Redirects are followed, including http<->https (max 10, loops detected, every hop re-validated).
   TLS certificates and host names are always verified; a bad certificate is reported as a TLS error.
+- **Force http (on by default):** every `https://` *stream* URL (manifest, segments, keys, redirect targets) is rewritten to
+  `http://` (`:443` is dropped). This disables TLS for streams: traffic and tokens are readable on the network, and hosts that only
+  serve https will fail or redirect back to https. The playlist download is not affected. Turn it off with `-PFORCE_HTTP=false`
+  (or env `FORCE_HTTP=false`) when building.
 - **Stream types:** HLS (`.m3u8`), DASH (`.mpd`), live PHP/TS endpoints (`...live.php?...&extension=ts`), and URLs with no
   extension. Type comes from `manifest_type`, then the path extension, then `extension=`; if still unknown, the first bytes
   of the response (Content-Type, `#EXTM3U`, `<MPD`, TS sync bytes) decide.

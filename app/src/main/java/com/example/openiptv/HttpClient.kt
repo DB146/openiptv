@@ -47,12 +47,14 @@ object HttpClient {
         sniff: Boolean = false,
         connectTimeoutMs: Int = 10_000,
         readTimeoutMs: Int = 15_000,
+        /** Rewrite every https:// URL, including redirect targets, to http:// (see [UrlPolicy]). */
+        forceHttp: Boolean = false,
     ): Fetched {
         var current = url
         var hops = 0
         val seen = HashSet<String>()
         while (true) {
-            val parsed = when (val check = StreamUrl.check(current)) {
+            val parsed = when (val check = StreamUrl.check(UrlPolicy.apply(current, forceHttp))) {
                 is UrlCheck.Ok -> check.parsed
                 is UrlCheck.Bad -> throw HttpError(
                     if (hops == 0) HttpError.Kind.INVALID_URL else HttpError.Kind.REDIRECT,

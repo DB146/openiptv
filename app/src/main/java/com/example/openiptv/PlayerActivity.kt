@@ -2,6 +2,7 @@ package com.example.openiptv
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,6 +20,7 @@ import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import kotlin.concurrent.thread
@@ -144,7 +146,7 @@ class PlayerActivity : Activity() {
         // No extension, no manifest_type: ask the server what this URL is before handing it to ExoPlayer,
         // which would otherwise treat it as a plain file. Skipped if the user has already moved on.
         thread {
-            val probe = StreamProbe.detect(ch.url, ch.requestHeaders)
+            val probe = StreamProbe.detect(ch.url, ch.requestHeaders, BuildConfig.FORCE_HTTP)
             runOnUiThread {
                 if (isDestroyed || !started || current !== ch) return@runOnUiThread
                 val err = probe.error
@@ -168,7 +170,11 @@ class PlayerActivity : Activity() {
             .setAllowCrossProtocolRedirects(true) // http<->https hops; TLS certificates are still verified
             .setConnectTimeoutMs(10_000)
             .setReadTimeoutMs(15_000)
-        val msf = DefaultMediaSourceFactory(http)
+        // Force-http mode: rewrite every request ExoPlayer makes for the stream (manifest, segments, keys). The playlist download is not affected.
+        val source = if (BuildConfig.FORCE_HTTP) {
+            ResolvingDataSource.Factory(http) { spec -> spec.withUri(Uri.parse(UrlPolicy.downgrade(spec.uri.toString()))) }
+        } else http
+        val msf = DefaultMediaSourceFactory(source)
         var clearKey = false
         val keySpec = ch.licenseKey
         if (ch.usesClearKey && keySpec != null) {
