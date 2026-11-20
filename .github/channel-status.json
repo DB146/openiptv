@@ -1,0 +1,517 @@
+{
+  "http://cdn4.skygo.mn/live/disk1/Discovery_Asia/HLSv3-FTA/Discovery_Asia.m3u8": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "DISCOVERY ASIA HD"
+  },
+  "http://line.watchtivo-8k.com:80/play/live.php?mac=00:1A:79:3F:0C:96&stream=1084668&extension=ts&play_token=onuPSPIV6o": {
+    "detail": "HTTP 452",
+    "fails": 1,
+    "name": "Filmbox"
+  },
+  "http://line.watchtivo-8k.com:80/play/live.php?mac=00:1A:79:3F:0C:96&stream=960054&extension=ts&play_token=qpvBSWKfyz": {
+    "detail": "HTTP 452",
+    "fails": 1,
+    "name": "BabyTV"
+  },
+  "https://64d0d74b76158.streamlock.net/THDTR/thdtradio/chunklist.m3u8": {
+    "detail": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostn",
+    "fails": 1,
+    "name": "Đồng Tháp"
+  },
+  "https://cdn.qd.je/163189/cctv5": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "CCTV5"
+  },
+  "https://cdn.qd.je/163189/cctv5p": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "CCTV5+"
+  },
+  "https://cloudstreamthdn.tek4tv.vn/audio/daknong_radio/chunklist_w1535814517.m3u8": {
+    "detail": "URLError: <urlopen error [Errno -2] Name or service not known>",
+    "fails": 1,
+    "name": "Lâm Đồng"
+  },
+  "https://freem3u.xyz/api/live/play.m3u8?vid=110": {
+    "detail": "HTTP 503",
+    "fails": 1,
+    "name": "VTV5"
+  },
+  "https://live.baoquangninh.vn/qtvlive/tv3live.m3u8": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "QTV3 HD - Báo và PTTH Thành Phố Quảng Ninh"
+  },
+  "https://live.canthotv.vn/live/radio/chunklist_w1780522487.m3u8": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "Cần Thơ Radio 1"
+  },
+  "https://live.huetv.com.vn/TRT-Online/chunklist.m3u8": {
+    "detail": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unabl",
+    "fails": 1,
+    "name": "Huế TV - Báo và PTTH Huế"
+  },
+  "https://liveatmvng.vtvprime.vn/live/data8/SCTV15HD/Live_DASHDRM/SCTV15HD.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV15"
+  },
+  "https://liveatmvng.vtvprime.vn/live/data8/SCTV17/Live_DASHDRM/SCTV17.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV17"
+  },
+  "https://liveatmvng.vtvprime.vn/live/data8/SCTV22/Live_DASHDRM/SCTV22.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV22"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT1/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 1"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT10/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 10"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT2/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 2"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT3/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 3"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT4/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 4"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT5/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 5"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT6/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 6"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT7/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 7"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT8/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 8"
+  },
+  "https://livesctvng.vtvprime.vn/Live_DASHDRM1/ONSPORT9/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 9"
+  },
+  "https://livevliatmcdw.seenow.vn/live/data8/BONGDA_HD/Live_DASHDRM/BONGDA_HD.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "On Football 50fps"
+  },
+  "https://livevliatmcdw.seenow.vn/live/data8/HAY_TV/Live_DASHDRM/HAY_TV.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "On Sports + 50fps"
+  },
+  "https://livevliatmcdw.seenow.vn/live/data8/SKSS1/Live_DASHDRM/SKSS1.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 11"
+  },
+  "https://livevliatmcdw.seenow.vn/live/data8/SKSS2/Live_DASHDRM/SKSS2.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 12"
+  },
+  "https://livevliatmcdw.seenow.vn/live/data8/SKSS3/Live_DASHDRM/SKSS3.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 13"
+  },
+  "https://livevliatmcdw.seenow.vn/live/data8/SKSS4/Live_DASHDRM/SKSS4.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 14"
+  },
+  "https://livevliatmcdw.seenow.vn/live/data8/SKSS5/Live_DASHDRM/SKSS5.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 15"
+  },
+  "https://livevliatmcdw.seenow.vn/live/data8/SKSS6/Live_DASHDRM/SKSS6.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 16"
+  },
+  "https://livevlisctcdnw.seenow.vn/Live_DASHDRM1/BM1/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "Box Movie 1"
+  },
+  "https://livevlisctcdnw.seenow.vn/Live_DASHDRM1/HC/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "Hollywood Classics"
+  },
+  "https://livevlisctcdnw.seenow.vn/Live_DASHDRM1/THETHAO_TINTUC_HD/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "On Sports News 50fps"
+  },
+  "https://livevlisctcdnw.seenow.vn/Live_DASHDRM1/WO/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "Woman"
+  },
+  "https://livevlisctcdnw.seenow.vn/Live_DASHDRM2/THETHAO_HD/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "On Sports 50fps"
+  },
+  "https://livevlisctcdnw.seenow.vn/livesnv2/MUSICBOX/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "Music Box"
+  },
+  "https://livevlisctcdnw.seenow.vn/mean/BOXHIT/manifest.mpd": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "Box Hits"
+  },
+  "https://nhk.lls.pbs.org/index.m3u8": {
+    "detail": "not a playlist (application/vnd.apple.mpegurl)",
+    "fails": 1,
+    "name": "NHK WORLD JAPAN"
+  },
+  "https://ott.tv5monde.com/Content/HLS/Live/channel(seasie)/variant.m3u8": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "TV5 MONDE"
+  },
+  "https://ott3.nethubtv.vn/live/bentretv/chunklist_2.m3u8": {
+    "detail": "URLError: <urlopen error timed out>",
+    "fails": 1,
+    "name": "QNgTV2 - Báo và PTTH Quảng Ngãi"
+  },
+  "https://qipmgzougxliv.vcdn.cloud/app/stream/master.m3u8": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "VTVPrime 188"
+  },
+  "https://s935.cdn.mytvnet.vn/pkg20/live_dzones/aplus.smil/manifest.mpd": {
+    "detail": "URLError: <urlopen error timed out>",
+    "fails": 1,
+    "name": "ABC Australia"
+  },
+  "https://tpninosaga.duckdns.org/source/tv360.m3u8?id=189&token=NinoEra36": {
+    "detail": "URLError: <urlopen error [Errno -2] Name or service not known>",
+    "fails": 1,
+    "name": "ON Info TV"
+  },
+  "https://tv.angiangtv.vn/live/kgaudio/kgaudio.m3u8": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "4 Mhz"
+  },
+  "https://video.detik.com/livecnbc/smil:cnbctv/chunklist_w1279679883_b384000_sleng.m3u8": {
+    "detail": "URLError: <urlopen error _ssl.c:1063: The handshake operation timed out>",
+    "fails": 1,
+    "name": "CNBC"
+  },
+  "https://vmttv.dpdns.org/VTVGo/?sctv1": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV1"
+  },
+  "https://vmttv.dpdns.org/VTVGo/?sctv10": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV10"
+  },
+  "https://vmttv.dpdns.org/VTVGo/?sctv14": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV14"
+  },
+  "https://vmttv.dpdns.org/VTVGo/?sctv19": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV19"
+  },
+  "https://vmttv.dpdns.org/VTVGo/?sctv21": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV21 - Việt Nam Ký Ức"
+  },
+  "https://vmttv.dpdns.org/VTVGo/?sctv5": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV5"
+  },
+  "https://vmttv.dpdns.org/VTVGo/?sctv8": {
+    "detail": "HTTP 403",
+    "fails": 1,
+    "name": "SCTV8"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-anime": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Anime"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-bundesliga": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Bundesliga"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-c1-chau-au": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 C1 Châu Âu"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-c2-chau-au": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 C2 Châu Âu"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-c3-chau-au": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 C3 Châu Âu"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-cong-thuc-1": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Công Thức 1"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-doraemon": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Doraemon"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-golf": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Golf"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-hai-tinh-cam": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Hài - Tình Cảm"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-hanh-dong-chau-a": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Hành Động Châu Á"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-hoa-ngu": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Phim Hoa Ngữ"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-k-drama": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 K-Drama"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-mr-bean": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Mr.bean"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-phim-4k": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Phim 4K"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-phim-kinh-dien": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Phim Kinh Điển"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-song-khoe": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Sống Khỏe"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-tennis": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Tennis"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-the-thao-chau-a": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Thể Thao Châu Á"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=360-thieu-nhi": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Thiếu Nhi"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=bac-ninh": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "BTV - Báo và PTTH Thành Phố Bắc Ninh"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=gia-lai": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "GTV - Báo và PTTH Gia Lai"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=hitv": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "HiTV"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=hoat-hinh": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Hoạt hình"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=htv-the-thao": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "HTV Thể Thao"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=hung-yen": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "HY - Báo và PTTH Hưng Yên"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=khanh-hoa-1": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "KTV1 HD - Báo và PTTH Khánh Hòa"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=phim-au-my": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Phim Âu Mỹ"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=phim-viet": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "360 Phim Việt"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=phu-tho": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "PTV HD - Báo và PTTH Phú Thọ"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tuyen-quang": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TTV HD - Báo và PTTH Tuyên Quang"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-10": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+10"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-11": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+11"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-12": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+12"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-13": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+13"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-14": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+14"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-15": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+15"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-3": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+3"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-5": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+5"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-8": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+8"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=tv360-9": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "TV360+9"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=vtv10": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "VTV10"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=vtv2": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "VTV2"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=vtv3": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "VTV3"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=vtv7": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "VTV7"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=vtv9": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "VTV9"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=vtvcab-2-phim-viet-hd": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "ON Phim Việt"
+  },
+  "https://vmttv.dpdns.org/tv360/?id=vtvcab-23-golf-channel": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "On Golf"
+  },
+  "https://wowza.jejumbc.com/live/tv_jejumbc/playlist.m3u8": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "MBC Jeju"
+  },
+  "https://wse.hatinhtv.net/radio/voht/playlist.m3u8": {
+    "detail": "HTTP 404",
+    "fails": 1,
+    "name": "Hà Tĩnh"
+  }
+}
