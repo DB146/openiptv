@@ -1,39 +1,65 @@
 package com.example.openiptv
 
 import android.content.Context
+import android.util.Log
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.Normalizer
 import java.util.Locale
 
 /** The fixed playlist (BuildConfig.M3U_URL), its on-disk cache, last-played memory and channel lookup. */
 object Playlist {
+    private const val TAG = "OpenIPTV"
+    private const val MAX_PLAYLIST_BYTES = 16 * 1024 * 1024
+
     @Volatile var channels: List<Channel> = emptyList()
+    /** XMLTV guide URLs from the #EXTM3U header (url-tvg), validated. */
+    @Volatile var epgUrls: List<String> = emptyList()
+    /** Entries skipped or flagged during the last parse; also written to logcat (tag OpenIPTV). */
+    @Volatile var issues: List<ParseIssue> = emptyList()
 
     private fun cacheFile(c: Context) = File(c.filesDir, "playlist.m3u")
     private fun prefs(c: Context) = c.getSharedPreferences("state", 0)
 
+    private fun apply(doc: ParsedPlaylist) {
+        doc.issues.forEach { Log.w(TAG, "playlist line ${it.line}: ${it.message}") }
+        channels = doc.channels
+        epgUrls = doc.header.epgUrls
+        issues = doc.issues
+    }
+
     fun loadCache(c: Context) {
-        runCatching { channels = M3uParser.parse(cacheFile(c).readText()) }
+        runCatching { apply(M3uParser.parseDocument(cacheFile(c).readText())) }
     }
 
     fun isFresh(c: Context) = channels.isNotEmpty() &&
         System.currentTimeMillis() - cacheFile(c).lastModified() < 60 * 60 * 1000L
 
-    /** Blocking download; call off the main thread. Returns true if a non-empty playlist was loaded. */
+    /**
+     * Blocking download; call off the main thread. Returns true if a non-empty playlist was loaded.
+     * The URL must be http:// or https://; redirects (including http<->https) are followed and
+     * TLS certificates are verified. On failure the cached playlist stays in use.
+     */
     fun download(c: Context): Boolean {
         if (BuildConfig.M3U_URL.isBlank()) return false
         return try {
-            val conn = URL(BuildConfig.M3U_URL).openConnection() as HttpURLConnection
-            conn.connectTimeout = 10000; conn.readTimeout = 20000
-            val text = conn.inputStream.bufferedReader().use { it.readText() }
-            val list = M3uParser.parse(text)
-            if (list.isEmpty()) return false
+            val r = HttpClient.fetch(BuildConfig.M3U_URL, maxBytes = MAX_PLAYLIST_BYTES, readTimeoutMs = 20_000)
+            if (r.truncated) {
+                Log.w(TAG, "Playlist larger than $MAX_PLAYLIST_BYTES bytes, ignored")
+                return false
+            }
+            val text = r.body.toString(Charsets.UTF_8)
+            val doc = M3uParser.parseDocument(text)
+            if (doc.channels.isEmpty()) return false
             cacheFile(c).writeText(text)
-            channels = list
+            apply(doc)
             true
-        } catch (e: Exception) { false }
+        } catch (e: HttpError) {
+            Log.w(TAG, "Playlist download failed (${e.kind}): ${e.message}")
+            false
+        } catch (e: Exception) {
+            Log.w(TAG, "Playlist download failed: ${e.javaClass.simpleName}")
+            false
+        }
     }
 
     fun saveLast(c: Context, ch: Channel) =

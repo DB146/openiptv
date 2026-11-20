@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -137,16 +138,45 @@ class PlayerActivity : Activity() {
         if (ch == current && player != null) { showChannel(ch); return }
         current = ch
         Playlist.saveLast(this, ch)
-        player?.release()
+        player?.release(); player = null
+        showChannel(ch)
+        if (ch.streamType != StreamType.UNKNOWN) { startPlayback(ch, ch.streamType); return }
+        // No extension, no manifest_type: ask the server what this URL is before handing it to ExoPlayer,
+        // which would otherwise treat it as a plain file. Skipped if the user has already moved on.
+        thread {
+            val probe = StreamProbe.detect(ch.url, ch.requestHeaders)
+            runOnUiThread {
+                if (isDestroyed || !started || current !== ch) return@runOnUiThread
+                val err = probe.error
+                if (err != null && err.kind == HttpError.Kind.TLS) {
+                    // Deterministic and security relevant: say so instead of a generic playback error.
+                    Toast.makeText(this, "${ch.name}: ${err.message}", Toast.LENGTH_LONG).show()
+                } else {
+                    startPlayback(ch, probe.type)
+                }
+            }
+        }
+    }
+
+    private fun startPlayback(ch: Channel, type: StreamType) {
+        player?.release(); player = null
+        // User-Agent / Referer from #EXTVLCOPT go on every request: manifest and media segments alike.
+        val headers = ch.requestHeaders
         val http = DefaultHttpDataSource.Factory()
-            .setUserAgent(ch.userAgent ?: "Mozilla/5.0")
-            .setAllowCrossProtocolRedirects(true)
-        ch.referer?.let { http.setDefaultRequestProperties(mapOf("Referer" to it)) }
+            .setUserAgent(headers["User-Agent"])
+            .setDefaultRequestProperties(headers.filterKeys { it != "User-Agent" })
+            .setAllowCrossProtocolRedirects(true) // http<->https hops; TLS certificates are still verified
+            .setConnectTimeoutMs(10_000)
+            .setReadTimeoutMs(15_000)
         val msf = DefaultMediaSourceFactory(http)
-        ch.clearKey?.let { spec ->
-            val drm = ClearKey.sessionManager(spec)
-            if (drm != null) msf.setDrmSessionManagerProvider { drm }
+        var clearKey = false
+        val keySpec = ch.licenseKey
+        if (ch.usesClearKey && keySpec != null) {
+            val drm = ClearKey.sessionManager(keySpec)
+            if (drm != null) { msf.setDrmSessionManagerProvider { drm }; clearKey = true }
             else Toast.makeText(this, "Invalid ClearKey for ${ch.name}", Toast.LENGTH_SHORT).show()
+        } else if (ch.licenseType != null && ch.licenseType != "clearkey") {
+            Toast.makeText(this, "Unsupported DRM '${ch.licenseType}' for ${ch.name}", Toast.LENGTH_SHORT).show()
         }
         val p = ExoPlayer.Builder(this).setMediaSourceFactory(msf).build()
         p.setVideoSurfaceView(surface)
@@ -156,11 +186,19 @@ class PlayerActivity : Activity() {
             }
         })
         val item = MediaItem.Builder().setUri(ch.url).apply {
-            if (ch.clearKey != null) setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.CLEARKEY_UUID).build())
+            // The MIME type tells ExoPlayer how to read URLs it can't infer from the extension (.php, ?id=...).
+            mimeTypeFor(type)?.let { setMimeType(it) }
+            if (clearKey) setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.CLEARKEY_UUID).build())
         }.build()
         p.setMediaItem(item); p.prepare(); p.playWhenReady = true
         player = p
-        showChannel(ch)
+    }
+
+    private fun mimeTypeFor(type: StreamType): String? = when (type) {
+        StreamType.HLS -> MimeTypes.APPLICATION_M3U8
+        StreamType.DASH -> MimeTypes.APPLICATION_MPD
+        StreamType.TS -> MimeTypes.VIDEO_MP2T
+        StreamType.UNKNOWN -> null // let ExoPlayer sniff the container
     }
 
     private fun step(delta: Int) {

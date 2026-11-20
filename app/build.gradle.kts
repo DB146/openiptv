@@ -39,4 +39,7 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.3.1")
     implementation("androidx.media3:media3-exoplayer-hls:1.3.1")
     implementation("androidx.media3:media3-exoplayer-dash:1.3.1")
+
+    // JVM unit tests (parser, URL validation, ClearKey, HTTP client): ./gradlew :app:testDebugUnitTest
+    testImplementation("junit:junit:4.13.2")
 }
