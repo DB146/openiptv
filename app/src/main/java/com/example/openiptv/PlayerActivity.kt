@@ -41,6 +41,8 @@ class PlayerActivity : Activity() {
     private var request: Intent? = null
     private var started = false
     private var typed = ""
+    /** Stream types already handed to ExoPlayer for the current channel (see [onContainerError]). */
+    private val attempted = HashSet<StreamType>()
     private val ui = Handler(Looper.getMainLooper())
 
     private lateinit var surface: SurfaceView
@@ -141,6 +143,7 @@ class PlayerActivity : Activity() {
     private fun play(ch: Channel) {
         if (ch == current && player != null) { showChannel(ch); return }
         current = ch
+        attempted.clear()
         Playlist.saveLast(this, ch)
         player?.release(); player = null
         showChannel(ch)
@@ -164,6 +167,7 @@ class PlayerActivity : Activity() {
     }
 
     private fun startPlayback(ch: Channel, type: StreamType) {
+        attempted.add(type)
         player?.release(); player = null
         // User-Agent / Referer from #EXTVLCOPT go on every request: manifest and media segments alike.
         val headers = ch.requestHeaders
@@ -199,6 +203,7 @@ class PlayerActivity : Activity() {
         p.setVideoSurfaceView(surface)
         p.addListener(object : Player.Listener {
             override fun onPlayerError(e: PlaybackException) {
+                if (onContainerError(ch, e)) return
                 Toast.makeText(this@PlayerActivity, "Playback error: ${e.errorCodeName}", Toast.LENGTH_SHORT).show()
             }
         })
@@ -209,6 +214,25 @@ class PlayerActivity : Activity() {
         }.build()
         p.setMediaItem(item); p.prepare(); p.playWhenReady = true
         player = p
+    }
+
+    /**
+     * A channel whose type was only sniffed (no extension / manifest_type) can still be misjudged, e.g. a redirecting
+     * endpoint that answered the probe with something unusable. ExoPlayer then reports a container/manifest parsing
+     * error; instead of giving up, try the remaining stream types, most likely first. Returns true if a retry was queued.
+     */
+    private fun onContainerError(ch: Channel, e: PlaybackException): Boolean {
+        if (ch.streamType != StreamType.UNKNOWN || current !== ch) return false
+        when (e.errorCode) {
+            PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED,
+            PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED,
+            PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED,
+            PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED -> {}
+            else -> return false
+        }
+        val next = listOf(StreamType.HLS, StreamType.TS, StreamType.DASH).firstOrNull { it !in attempted } ?: return false
+        ui.post { if (!isDestroyed && started && current === ch) startPlayback(ch, next) }
+        return true
     }
 
     private fun mimeTypeFor(type: StreamType): String? = when (type) {

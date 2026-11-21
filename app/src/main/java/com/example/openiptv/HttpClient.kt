@@ -9,7 +9,7 @@ import java.net.URL
 import javax.net.ssl.SSLException
 
 /** A failed request. [kind] lets callers tell a bad certificate from a timeout. Messages carry the host, never the full URL. */
-class HttpError(val kind: Kind, message: String, cause: Throwable? = null) : IOException(message, cause) {
+class HttpError(val kind: Kind, message: String, cause: Throwable? = null, val status: Int = 0) : IOException(message, cause) {
     enum class Kind { INVALID_URL, REDIRECT, TLS, TIMEOUT, STATUS, IO }
 }
 
@@ -104,7 +104,7 @@ object HttpClient {
                     current = resolve(parsed.url, location)
                     continue
                 }
-                if (code !in 200..299) throw HttpError(HttpError.Kind.STATUS, "HTTP $code from ${parsed.host}")
+                if (code !in 200..299) throw HttpError(HttpError.Kind.STATUS, "HTTP $code from ${parsed.host}", status = code)
 
                 val (body, truncated) = readBody(conn, maxBytes)
                 return Fetched(parsed.url, code, conn.contentType, body, truncated, hops)

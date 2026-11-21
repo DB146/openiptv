@@ -1,7 +1,10 @@
 package com.example.openiptv
 
-/** Outcome of [StreamProbe.detect]. [error] is set when the request failed (type is then UNKNOWN). */
-class Probe(val type: StreamType, val error: HttpError? = null)
+/**
+ * Outcome of [StreamProbe.detect]. [error] is set when the request failed (type is then UNKNOWN).
+ * [finalUrl] is where the redirects ended, when a response was received.
+ */
+class Probe(val type: StreamType, val error: HttpError? = null, val finalUrl: String? = null)
 
 /**
  * For generic URLs with no extension and no manifest_type (e.g. https://host/tv?id=7): fetch the first
@@ -10,10 +13,50 @@ class Probe(val type: StreamType, val error: HttpError? = null)
 object StreamProbe {
     private const val SNIFF_BYTES = 1024
 
-    /** Blocking. Sends the channel's own headers (User-Agent, Referer) and validates every redirect hop. */
-    fun detect(url: String, headers: Map<String, String>, forceHttp: Boolean = false, fallbackToHttp: Boolean = false): Probe = try {
+    /**
+     * Blocking. Sends the channel's own headers (User-Agent, Referer) and validates every redirect hop.
+     *
+     * Redirecting endpoints (e.g. https://host/play?channel -> a tokenised .m3u8 or a live TS) can answer
+     * differently from one request to the next: an error page, an empty body, a half-started stream. Handing
+     * ExoPlayer an UNKNOWN type then ends in PARSING_CONTAINER_UNSUPPORTED, so an unrecognised or transiently
+     * failed probe is retried up to [attempts] times before giving up. TLS and invalid-URL errors are
+     * deterministic and returned at once.
+     */
+    fun detect(
+        url: String,
+        headers: Map<String, String>,
+        forceHttp: Boolean = false,
+        fallbackToHttp: Boolean = false,
+        attempts: Int = 3,
+        retryDelayMs: Long = 400,
+    ): Probe {
+        var last = Probe(StreamType.UNKNOWN)
+        for (i in 1..attempts.coerceAtLeast(1)) {
+            last = detectOnce(url, headers, forceHttp, fallbackToHttp)
+            if (last.type != StreamType.UNKNOWN) return last
+            val err = last.error
+            if (err != null && !isTransient(err)) return last
+            if (i < attempts && retryDelayMs > 0) {
+                try { Thread.sleep(retryDelayMs) } catch (e: InterruptedException) { Thread.currentThread().interrupt(); return last }
+            }
+        }
+        return last
+    }
+
+    private fun isTransient(e: HttpError) = when (e.kind) {
+        HttpError.Kind.IO, HttpError.Kind.TIMEOUT, HttpError.Kind.REDIRECT -> true
+        HttpError.Kind.STATUS -> e.status >= 500 || e.status == 429
+        HttpError.Kind.TLS, HttpError.Kind.INVALID_URL -> false
+    }
+
+    private fun detectOnce(url: String, headers: Map<String, String>, forceHttp: Boolean, fallbackToHttp: Boolean): Probe = try {
         val r = HttpClient.fetch(url, headers, SNIFF_BYTES, sniff = true, forceHttp = forceHttp, fallbackToHttp = fallbackToHttp)
-        Probe(classify(r.contentType, r.body))
+        var type = classify(r.contentType, r.body)
+        // The body didn't say (empty, odd Content-Type): the URL the redirects ended on may (".../index.m3u8?token=").
+        if (type == StreamType.UNKNOWN) {
+            (StreamUrl.check(r.finalUrl) as? UrlCheck.Ok)?.let { type = StreamUrl.classify(it.parsed) }
+        }
+        Probe(type, finalUrl = r.finalUrl)
     } catch (e: HttpError) {
         Probe(StreamType.UNKNOWN, e)
     }
@@ -39,9 +82,15 @@ object StreamProbe {
         }
     }
 
-    /** MPEG-TS packets are 188 bytes and each starts with the sync byte 0x47. */
+    /**
+     * MPEG-TS packets are 188 bytes and each starts with the sync byte 0x47. A live stream joined mid-packet
+     * starts at an arbitrary offset, so look for the sync pattern at any alignment within the first packet.
+     */
     private fun isTransportStream(b: ByteArray): Boolean {
-        if (b.size < 189 || b[0] != 0x47.toByte() || b[188] != 0x47.toByte()) return false
-        return b.size < 377 || b[376] == 0x47.toByte()
+        for (o in 0 until 188) {
+            if (o + 188 >= b.size) return false
+            if (b[o] == 0x47.toByte() && b[o + 188] == 0x47.toByte() && (o + 376 >= b.size || b[o + 376] == 0x47.toByte())) return true
+        }
+        return false
     }
 }
