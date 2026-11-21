@@ -312,7 +312,6 @@ https://vmttv.dpdns.org/tv360/?id=360-mr-bean
 https://vmttv.dpdns.org/tv360/?id=360-doraemon
 #EXTINF:-1 tvg-id="360songkhoe" group-title="Giải Trí" tvg-logo="https://img-evg1.tv360.vn/image1/2026/10/13/09/1791859801499/e3bcb47a3b1b_640_360.png", 360 Sống Khỏe
 https://vmttv.dpdns.org/tv360/?id=360-song-khoe
-#EXTINF:-1 tvg-id="360chautinhtri"
 #EXTINF:-1 group-title="Thể Thao" tvg-logo=" https://img-zlr1.tv360.vn/image1/2026/04/15/22/177626841934/e289a43bd190_640_360.png", 360 C1 Châu Âu
 #EXTVLCOPT:http-user-agent=Dalvik/2.1.0
 https://vmttv.dpdns.org/tv360/?id=360-c1-chau-au
@@ -721,7 +720,6 @@ https://str.vov.gov.vn/vovlive/vov3.sdp_aac/playlist.m3u8
 https://str.vov.gov.vn/vovlive/vov4.TayNguyen.sdp_aac/playlist.m3u8
 #EXTINF:-1 tvg-id="vov5" group-title="Radio" tvg-logo="https://i.imgur.com/wd9CDkT.png" radio="true",VOV5 WORLD
 https://str.vov.gov.vn/vovlive/vov5.sdp_aac/chunklist.m3u8
-#EXTINF:-1
 #EXTINF:-1 tvg-id="vovgthn" group-title="Radio" tvg-logo="https://i.imgur.com/Wu8zN9H.png" radio="true",VOV GIAO THÔNG HÀ NỘI
 https://audio-lss.vov.vn/live/giao_thong_ha_noi.m3u8
 #EXTINF:-1 tvg-id="vovgthcm" group-title="Radio" tvg-logo="https://i.imgur.com/Wu8zN9H.png" radio="true",VOV GIAO THÔNG TP.HCM
