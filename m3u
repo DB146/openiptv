@@ -21,8 +21,8 @@ https://vmttv.dpdns.org/tv360/?id=vtv6
 https://vmttv.dpdns.org/tv360/?id=vtv7
 #EXTINF:-1 tvg-id="vtv8hd" group-title="VTV" tvg-logo="https://epg-images.vthanhchannel.workers.dev/image/2026-09-17/10.png?w=800&fit=scale-down&q=85" catchup="default" catchup-days="2", VTV8
 https://vmttv.dpdns.org/tv360/?id=vtv8
-#DISABLED# #EXTINF:-1 tvg-id="vtv9hd" group-title="VTV" tvg-logo="https://epg-images.vthanhchannel.workers.dev/image/2026-09-17/11.png?w=800&fit=scale-down&q=85", VTV9
-#DISABLED# https://vmttv.dpdns.org/tv360/?id=vtv9
+#EXTINF:-1 tvg-id="vtv9hd" group-title="VTV" tvg-logo="https://epg-images.vthanhchannel.workers.dev/image/2026-09-17/11.png?w=800&fit=scale-down&q=85", VTV9
+https://vmttv.dpdns.org/tv360/?id=vtv9
 #EXTINF:-1 tvg-id="vtv10hd" group-title="VTV" tvg-logo="https://epg-images.vthanhchannel.workers.dev/image/2026-09-17/12.png?w=800&fit=scale-down&q=85", VTV10
 https://vmttv.dpdns.org/tv360/?id=vtv10
 #EXTINF:-1 tvg-id="tv360plus1" group-title="Sự Kiện TV360" tvg-logo="https://img-zlr1.tv360.vn/image1/2026/04/15/22/1776266760359/ba1ca843cd06_480_270.png", TV360+1
@@ -49,12 +49,12 @@ https://vmttv.dpdns.org/tv360/?id=tv360-3
 #KODIPROP:inputstream.adaptive.license_type=clearkey
 #KODIPROP:inputstream.adaptive.license_key=70d033252d025d719ba70a37acc0f5c8:6ca465d8b3018f1604da6d43d3395a6d
 https://vmttv.dpdns.org/tv360/?id=tv360-4
-#DISABLED# #EXTINF:-1 tvg-id="tv360plus5" group-title="Sự Kiện TV360" tvg-logo="https://img-ali1.tv360.vn/image1/2024/09/24/21/1727189978632/51f31c767a91_640_360.png", TV360+5
-#DISABLED# #EXTVLCOPT:http-user-agent=Dalvik/2.1.0
-#DISABLED# #KODIPROP:inputstream.adaptive.manifest_type=mpd
-#DISABLED# #KODIPROP:inputstream.adaptive.license_type=clearkey
-#DISABLED# #KODIPROP:inputstream.adaptive.license_key=ad06f4610c564dc78f5955b71fa85fe8:0ebfe0ecc37ddb67b2bc9580e1b8fbed
-#DISABLED# https://vmttv.dpdns.org/tv360/?id=tv360-5
+#EXTINF:-1 tvg-id="tv360plus5" group-title="Sự Kiện TV360" tvg-logo="https://img-ali1.tv360.vn/image1/2024/09/24/21/1727189978632/51f31c767a91_640_360.png", TV360+5
+#EXTVLCOPT:http-user-agent=Dalvik/2.1.0
+#KODIPROP:inputstream.adaptive.manifest_type=mpd
+#KODIPROP:inputstream.adaptive.license_type=clearkey
+#KODIPROP:inputstream.adaptive.license_key=ad06f4610c564dc78f5955b71fa85fe8:0ebfe0ecc37ddb67b2bc9580e1b8fbed
+https://vmttv.dpdns.org/tv360/?id=tv360-5
 #EXTINF:-1 tvg-id="tv360plus6" group-title="Sự Kiện TV360" tvg-logo="https://img-ali1.tv360.vn/image1/2024/09/24/22/1727190010448/7463a4b5c14d_640_360.png", TV360+6
 #EXTVLCOPT:http-user-agent=Dalvik/2.1.0
 #KODIPROP:inputstream.adaptive.manifest_type=mpd
