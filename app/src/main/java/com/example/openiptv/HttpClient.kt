@@ -47,14 +47,13 @@ object HttpClient {
         sniff: Boolean = false,
         connectTimeoutMs: Int = 10_000,
         readTimeoutMs: Int = 15_000,
-        forceHttp: Boolean = false,
         /** If the https:// request fails to connect (TLS error, I/O error, timeout), retry once over http://. HTTP status errors never trigger this. */
         fallbackToHttp: Boolean = false,
     ): Fetched {
         try {
-            return fetchOnce(url, headers, maxBytes, sniff, connectTimeoutMs, readTimeoutMs, forceHttp)
+            return fetchOnce(url, headers, maxBytes, sniff, connectTimeoutMs, readTimeoutMs, false)
         } catch (e: HttpError) {
-            val retry = fallbackToHttp && !forceHttp && url.trim().startsWith("https://", ignoreCase = true) &&
+            val retry = fallbackToHttp && url.trim().startsWith("https://", ignoreCase = true) &&
                 e.kind in setOf(HttpError.Kind.TLS, HttpError.Kind.IO, HttpError.Kind.TIMEOUT)
             if (!retry) throw e
             return fetchOnce(url, headers, maxBytes, sniff, connectTimeoutMs, readTimeoutMs, true)
@@ -68,14 +67,14 @@ object HttpClient {
         sniff: Boolean = false,
         connectTimeoutMs: Int = 10_000,
         readTimeoutMs: Int = 15_000,
-        /** Rewrite every https:// URL, including redirect targets, to http:// (see [UrlPolicy]). */
+        /** Rewrite every https:// URL, including redirect targets, to http:// (used for the fallback retry). */
         forceHttp: Boolean = false,
     ): Fetched {
         var current = url
         var hops = 0
         val seen = HashSet<String>()
         while (true) {
-            val parsed = when (val check = StreamUrl.check(UrlPolicy.apply(current, forceHttp))) {
+            val parsed = when (val check = StreamUrl.check(if (forceHttp) UrlPolicy.downgrade(current) else current)) {
                 is UrlCheck.Ok -> check.parsed
                 is UrlCheck.Bad -> throw HttpError(
                     if (hops == 0) HttpError.Kind.INVALID_URL else HttpError.Kind.REDIRECT,

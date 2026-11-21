@@ -25,14 +25,12 @@ object StreamProbe {
     fun detect(
         url: String,
         headers: Map<String, String>,
-        forceHttp: Boolean = false,
-        fallbackToHttp: Boolean = false,
         attempts: Int = 3,
         retryDelayMs: Long = 400,
     ): Probe {
         var last = Probe(StreamType.UNKNOWN)
         for (i in 1..attempts.coerceAtLeast(1)) {
-            last = detectOnce(url, headers, forceHttp, fallbackToHttp)
+            last = detectOnce(url, headers)
             if (last.type != StreamType.UNKNOWN) return last
             val err = last.error
             if (err != null && !isTransient(err)) return last
@@ -49,8 +47,8 @@ object StreamProbe {
         HttpError.Kind.TLS, HttpError.Kind.INVALID_URL -> false
     }
 
-    private fun detectOnce(url: String, headers: Map<String, String>, forceHttp: Boolean, fallbackToHttp: Boolean): Probe = try {
-        val r = HttpClient.fetch(url, headers, SNIFF_BYTES, sniff = true, forceHttp = forceHttp, fallbackToHttp = fallbackToHttp)
+    private fun detectOnce(url: String, headers: Map<String, String>): Probe = try {
+        val r = HttpClient.fetch(url, headers, SNIFF_BYTES, sniff = true, fallbackToHttp = true)
         var type = classify(r.contentType, r.body)
         // The body didn't say (empty, odd Content-Type): the URL the redirects ended on may (".../index.m3u8?token=").
         if (type == StreamType.UNKNOWN) {

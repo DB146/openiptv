@@ -10,12 +10,6 @@ val m3uUrl: String = providers.gradleProperty("M3U_URL")
     .orElse(providers.environmentVariable("M3U_URL"))
     .orElse(DEFAULT_M3U).get().trim()
 
-// How https stream URLs are treated (see HttpMode / UrlPolicy): strict | fallback | force. Default fallback.
-// Set with -PHTTP_MODE=... or env HTTP_MODE. The playlist download is never affected.
-val httpMode: String = providers.gradleProperty("HTTP_MODE")
-    .orElse(providers.environmentVariable("HTTP_MODE"))
-    .orElse("fallback").get().trim().lowercase().let { if (it in setOf("strict", "fallback", "force")) it else "fallback" }
-
 android {
     namespace = "com.example.openiptv"
     compileSdk = 34
@@ -25,7 +19,6 @@ android {
         targetSdk = 34
         versionCode = 2
         versionName = "2.0"
-        buildConfigField("String", "HTTP_MODE", "\"" + httpMode + "\"")
         buildConfigField("String", "M3U_URL", "\"" + m3uUrl.replace("\\", "\\\\").replace("\"", "\\\"") + "\"")
     }
     buildFeatures { buildConfig = true }
@@ -46,7 +39,4 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.3.1")
     implementation("androidx.media3:media3-exoplayer-hls:1.3.1")
     implementation("androidx.media3:media3-exoplayer-dash:1.3.1")
-
-    // JVM unit tests (parser, URL validation, ClearKey, HTTP client): ./gradlew :app:testDebugUnitTest
-    testImplementation("junit:junit:4.13.2")
 }
