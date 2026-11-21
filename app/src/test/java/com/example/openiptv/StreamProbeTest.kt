@@ -42,6 +42,7 @@ class StreamProbeTest {
     @Test fun sniffsTransportStreams() {
         assertEquals(StreamType.TS, classify("application/octet-stream", ts(1024)))
         assertEquals(StreamType.TS, classify(null, ts(200, listOf(0, 188)))) // short sniff, two packets seen
+        assertEquals(StreamType.TS, classify(null, ts(1024, listOf(37, 225, 413)))) // live stream joined mid-packet
     }
 
     @Test fun doesNotMistakeOtherContentForAStream() {
@@ -50,6 +51,7 @@ class StreamProbeTest {
         assertEquals(StreamType.UNKNOWN, classify(null, ts(1024, listOf(0)))) // 0x47 once is not enough
         assertEquals(StreamType.UNKNOWN, classify(null, ts(100)))
         assertEquals(StreamType.UNKNOWN, classify(null, ts(1024, listOf(0, 188)).also { it[376] = 1 }))
+        assertEquals(StreamType.UNKNOWN, classify(null, ts(1024, listOf(37))))
         assertEquals(StreamType.UNKNOWN, classify(null, ByteArray(0)))
         assertEquals(StreamType.UNKNOWN, classify(null, "plain text"))
     }
@@ -109,7 +111,7 @@ class StreamProbeTest {
 
     @Test fun unrecognizedContentIsUnknownWithoutAnError() {
         route("/page", ct = "text/html", body = "<html></html>".toByteArray())
-        val p = StreamProbe.detect("$base/page", emptyMap())
+        val p = StreamProbe.detect("$base/page", emptyMap(), retryDelayMs = 0)
         assertEquals(StreamType.UNKNOWN, p.type)
         assertNull(p.error)
     }
@@ -118,5 +120,43 @@ class StreamProbeTest {
         val p = StreamProbe.detect("rtmp://h/live", emptyMap())
         assertEquals(StreamType.UNKNOWN, p.type)
         assertEquals(HttpError.Kind.INVALID_URL, p.error!!.kind)
+    }
+
+    @Test fun retriesWhenTheRedirectingEndpointAnswersBadlyAtFirst() {
+        val hits = java.util.concurrent.atomic.AtomicInteger()
+        server.createContext("/play") { ex ->
+            if (hits.incrementAndGet() < 3) {
+                ex.responseHeaders.add("Content-Type", "text/html")
+                val b = "<html>try later</html>".toByteArray()
+                ex.sendResponseHeaders(200, b.size.toLong()); ex.responseBody.use { it.write(b) }
+            } else {
+                ex.responseHeaders.add("Location", "/hls"); ex.sendResponseHeaders(302, -1)
+            }
+            ex.close()
+        }
+        route("/hls", body = "#EXTM3U\n".toByteArray())
+        val p = StreamProbe.detect("$base/play?sctv9", emptyMap(), retryDelayMs = 0)
+        assertEquals(StreamType.HLS, p.type)
+        assertEquals(3, hits.get())
+    }
+
+    @Test fun retriesTransientServerErrorsButNotClientErrors() {
+        val hits = java.util.concurrent.atomic.AtomicInteger()
+        server.createContext("/flaky") { ex ->
+            if (hits.incrementAndGet() == 1) ex.sendResponseHeaders(503, -1)
+            else { val b = "#EXTM3U\n".toByteArray(); ex.sendResponseHeaders(200, b.size.toLong()); ex.responseBody.use { it.write(b) } }
+            ex.close()
+        }
+        assertEquals(StreamType.HLS, StreamProbe.detect("$base/flaky", emptyMap(), retryDelayMs = 0).type)
+        route("/forbidden", 403)
+        assertEquals(HttpError.Kind.STATUS, StreamProbe.detect("$base/forbidden", emptyMap(), retryDelayMs = 0).error!!.kind)
+    }
+
+    @Test fun fallsBackToTheFinalUrlsExtensionWhenTheBodyIsNoHelp() {
+        route("/go", 302, location = "/live/index.m3u8?token=abc")
+        route("/live/index.m3u8", ct = "application/octet-stream") // empty body
+        val p = StreamProbe.detect("$base/go", emptyMap(), retryDelayMs = 0)
+        assertEquals(StreamType.HLS, p.type)
+        assertEquals("$base/live/index.m3u8?token=abc", p.finalUrl)
     }
 }
