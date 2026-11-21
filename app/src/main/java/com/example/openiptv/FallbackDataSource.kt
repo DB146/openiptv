@@ -1,7 +1,6 @@
 package com.example.openiptv
 
 import android.net.Uri
-import android.util.Log
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.HttpDataSource
@@ -9,7 +8,7 @@ import androidx.media3.datasource.TransferListener
 import java.io.IOException
 
 /**
- * HttpMode.FALLBACK for ExoPlayer: opens https:// requests normally, and if the secure connection fails
+ * Fallback for ExoPlayer: opens https:// requests normally, and if the secure connection fails
  * (TLS error, connection refused, timeout) reopens the same request over http://. HTTP status errors (403, 404...)
  * are passed through unchanged, because the server did answer. A host that failed once is sent straight to
  * http for the rest of the playback, so every segment doesn't pay the failed https attempt again.
@@ -36,7 +35,6 @@ class FallbackDataSource(
             throw e // the server answered; http would not help
         } catch (e: IOException) {
             if (host != null) downgradedHosts.add(host)
-            Log.w("OpenIPTV", "https failed for $host (${e.javaClass.simpleName}), falling back to http")
             runCatching { current.close() }
             return openOverHttp(dataSpec)
         }

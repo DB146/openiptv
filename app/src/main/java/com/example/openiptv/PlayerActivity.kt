@@ -2,7 +2,6 @@ package com.example.openiptv
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -21,7 +20,6 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import java.util.concurrent.ConcurrentHashMap
@@ -150,9 +148,8 @@ class PlayerActivity : Activity() {
         if (ch.streamType != StreamType.UNKNOWN) { startPlayback(ch, ch.streamType); return }
         // No extension, no manifest_type: ask the server what this URL is before handing it to ExoPlayer,
         // which would otherwise treat it as a plain file. Skipped if the user has already moved on.
-        val mode = HttpMode.parse(BuildConfig.HTTP_MODE)
         thread {
-            val probe = StreamProbe.detect(ch.url, ch.requestHeaders, mode == HttpMode.FORCE, mode == HttpMode.FALLBACK)
+            val probe = StreamProbe.detect(ch.url, ch.requestHeaders)
             runOnUiThread {
                 if (isDestroyed || !started || current !== ch) return@runOnUiThread
                 val err = probe.error
@@ -177,18 +174,10 @@ class PlayerActivity : Activity() {
             .setAllowCrossProtocolRedirects(true) // http<->https hops; TLS certificates are still verified
             .setConnectTimeoutMs(10_000)
             .setReadTimeoutMs(15_000)
-        // HTTP_MODE: strict = as written; fallback = https first, http if the secure connection fails; force = always http.
+        // https first; if the secure connection itself fails, the same request is retried over http.
         // The playlist download is never affected.
-        val source: DataSource.Factory = when (HttpMode.parse(BuildConfig.HTTP_MODE)) {
-            HttpMode.FORCE -> ResolvingDataSource.Factory(http) { spec ->
-                spec.withUri(Uri.parse(UrlPolicy.downgrade(spec.uri.toString())))
-            }
-            HttpMode.FALLBACK -> {
-                val downgradedHosts = ConcurrentHashMap.newKeySet<String>() // hosts that failed over https during this playback
-                DataSource.Factory { FallbackDataSource(http, downgradedHosts) }
-            }
-            HttpMode.STRICT -> http
-        }
+        val downgradedHosts = ConcurrentHashMap.newKeySet<String>() // hosts that failed over https during this playback
+        val source = DataSource.Factory { FallbackDataSource(http, downgradedHosts) }
         val msf = DefaultMediaSourceFactory(source)
         var clearKey = false
         val keySpec = ch.licenseKey
