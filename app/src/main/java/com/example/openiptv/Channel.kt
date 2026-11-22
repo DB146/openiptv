@@ -25,7 +25,17 @@ data class Channel(
     val attributes: Map<String, String> = emptyMap(),
     /** Every #EXTVLCOPT as written (lowercased names). */
     val vlcOptions: Map<String, String> = emptyMap(),
+    /**
+     * Backup sources for the same channel: later playlist entries with the same name. Each one is a complete
+     * [Channel] (own URL, headers and keys), never nested, and shares this channel's [number]. They are tried in
+     * order when the previous source fails to play.
+     */
+    val fallbacks: List<Channel> = emptyList(),
 ) {
+    /** This source followed by its [fallbacks], in the order they are tried. */
+    val allSources: List<Channel>
+        get() = if (fallbacks.isEmpty()) listOf(this) else listOf(this) + fallbacks
+
     /** Headers to send with every request for this channel's manifest and media segments. */
     val requestHeaders: Map<String, String>
         get() {
