@@ -1,5 +1,8 @@
 package com.example.openiptv
 
+import java.text.Normalizer
+import java.util.Locale
+
 /** #EXTM3U header: [attributes] as written (lowercased names) and the validated EPG URLs from url-tvg. */
 data class PlaylistHeader(
     val attributes: Map<String, String> = emptyMap(),
@@ -23,6 +26,7 @@ data class ParsedPlaylist(
  *  - #EXTVLCOPT: http-user-agent, http-referrer (also http-referer / http-user-referer spellings)
  *  - #KODIPROP: inputstream.adaptive.manifest_type / license_type / license_key
  *  - http:// and https:// stream URLs (validated; entries with bad URLs are skipped and reported)
+ *  - entries with the same name are merged into one channel; the extra URLs are fallback sources (see [Channel.fallbacks])
  *
  * #EXTVLCOPT and #KODIPROP lines may come before or after the #EXTINF line of their entry.
  */
@@ -70,7 +74,7 @@ object M3uParser {
                         when (val check = StreamUrl.check(line)) {
                             is UrlCheck.Bad -> issues.add(ParseIssue(lineNo, "\"${entry.name}\" skipped: ${check.reason}"))
                             is UrlCheck.Ok -> channels.add(
-                                buildChannel(channels.size + 1, entry, check.parsed, vlc, kodi, lineNo, issues)
+                                buildChannel(0, entry, check.parsed, vlc, kodi, lineNo, issues)
                             )
                         }
                     }
@@ -81,8 +85,29 @@ object M3uParser {
             }
         }
         if (info != null) issues.add(ParseIssue(infoLine, "#EXTINF without a stream URL"))
-        return ParsedPlaylist(header, channels, issues)
+        return ParsedPlaylist(header, mergeSources(channels), issues)
     }
+
+    /**
+     * Entries with the same name (ignoring case, accents and spacing) become ONE channel: the first entry is the
+     * primary source, the others (same URL dropped) are its [Channel.fallbacks] in playlist order. Channels are then
+     * numbered 1..N in order of first appearance.
+     */
+    private fun mergeSources(all: List<Channel>): List<Channel> {
+        val groups = LinkedHashMap<String, MutableList<Channel>>()
+        for (c in all) groups.getOrPut(nameKey(c.name)) { ArrayList() }.add(c)
+        var n = 0
+        return groups.values.map { g ->
+            n++
+            val extra = g.drop(1).filter { o -> o.url != g[0].url }.distinctBy { it.url }.map { it.copy(number = n) }
+            g[0].copy(number = n, fallbacks = extra)
+        }
+    }
+
+    internal fun nameKey(name: String): String =
+        Normalizer.normalize(name.lowercase(Locale.ROOT).replace("+", "plus"), Normalizer.Form.NFD)
+            .replace("\\p{M}".toRegex(), "").replace('đ', 'd')
+            .replace("[^a-z0-9]+".toRegex(), "")
 
     private class ExtInf(val name: String, val attrs: Map<String, String>)
 

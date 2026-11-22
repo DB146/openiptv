@@ -36,6 +36,9 @@ class PlayerActivity : Activity() {
     private companion object { const val COLUMNS = 3 }
     private var player: ExoPlayer? = null
     private var current: Channel? = null
+    /** Which of [current]'s sources is playing: [sourceIdx] into Channel.allSources (0 = the primary URL). */
+    private var active: Channel? = null
+    private var sourceIdx = 0
     private var request: Intent? = null
     private var started = false
     private var typed = ""
@@ -141,26 +144,51 @@ class PlayerActivity : Activity() {
     private fun play(ch: Channel) {
         if (ch == current && player != null) { showChannel(ch); return }
         current = ch
-        attempted.clear()
+        sourceIdx = 0
         Playlist.saveLast(this, ch)
         player?.release(); player = null
         showChannel(ch)
-        if (ch.streamType != StreamType.UNKNOWN) { startPlayback(ch, ch.streamType); return }
+        startSource(ch)
+    }
+
+    /** Starts source [sourceIdx] of [ch] (the primary URL, or one of its fallbacks). */
+    private fun startSource(ch: Channel) {
+        val src = ch.allSources[sourceIdx]
+        active = src
+        attempted.clear()
+        if (src.streamType != StreamType.UNKNOWN) { startPlayback(src, src.streamType); return }
         // No extension, no manifest_type: ask the server what this URL is before handing it to ExoPlayer,
         // which would otherwise treat it as a plain file. Skipped if the user has already moved on.
         thread {
-            val probe = StreamProbe.detect(ch.url, ch.requestHeaders)
+            val probe = StreamProbe.detect(src.url, src.requestHeaders)
             runOnUiThread {
-                if (isDestroyed || !started || current !== ch) return@runOnUiThread
+                if (isDestroyed || !started || current !== ch || active !== src) return@runOnUiThread
                 val err = probe.error
                 if (err != null && err.kind == HttpError.Kind.TLS) {
                     // Deterministic and security relevant: say so instead of a generic playback error.
-                    Toast.makeText(this, "${ch.name}: ${err.message}", Toast.LENGTH_LONG).show()
+                    if (!failOver(src)) Toast.makeText(this, "${ch.name}: ${err.message}", Toast.LENGTH_LONG).show()
                 } else {
-                    startPlayback(ch, probe.type)
+                    startPlayback(src, probe.type)
                 }
             }
         }
+    }
+
+    /**
+     * The source [failed] cannot be played: switch to the channel's next fallback, if it has one. Returns true if a
+     * switch was queued (the caller shows no error), false if there is nothing left to try.
+     */
+    private fun failOver(failed: Channel): Boolean {
+        val ch = current ?: return false
+        if (active !== failed || sourceIdx + 1 >= ch.allSources.size) return false
+        val next = ++sourceIdx
+        ui.post {
+            if (isDestroyed || !started || current !== ch || sourceIdx != next) return@post
+            player?.release(); player = null
+            showTitle("${ch.number}  ${ch.name}  (source ${next + 1}/${ch.allSources.size})")
+            startSource(ch)
+        }
+        return true
     }
 
     private fun startPlayback(ch: Channel, type: StreamType) {
@@ -193,6 +221,7 @@ class PlayerActivity : Activity() {
         p.addListener(object : Player.Listener {
             override fun onPlayerError(e: PlaybackException) {
                 if (onContainerError(ch, e)) return
+                if (failOver(ch)) return
                 Toast.makeText(this@PlayerActivity, "Playback error: ${e.errorCodeName}", Toast.LENGTH_SHORT).show()
             }
         })
@@ -211,7 +240,7 @@ class PlayerActivity : Activity() {
      * error; instead of giving up, try the remaining stream types, most likely first. Returns true if a retry was queued.
      */
     private fun onContainerError(ch: Channel, e: PlaybackException): Boolean {
-        if (ch.streamType != StreamType.UNKNOWN || current !== ch) return false
+        if (ch.streamType != StreamType.UNKNOWN || active !== ch) return false
         when (e.errorCode) {
             PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED,
             PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED,
@@ -220,7 +249,7 @@ class PlayerActivity : Activity() {
             else -> return false
         }
         val next = listOf(StreamType.HLS, StreamType.TS, StreamType.DASH).firstOrNull { it !in attempted } ?: return false
-        ui.post { if (!isDestroyed && started && current === ch) startPlayback(ch, next) }
+        ui.post { if (!isDestroyed && started && active === ch) startPlayback(ch, next) }
         return true
     }
 
