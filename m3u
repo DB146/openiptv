@@ -1131,11 +1131,6 @@ https://d3n2r2x6pixas4.cloudfront.net/out/v1/426d7a9e942b4f64917d66940bd3b147/in
 #KODIPROP:inputstream.adaptive.license_type=clearkey
 #KODIPROP:inputstream.adaptive.license_key=bdcf25ad46d7907c35832964b836a4bd:9edd4350307b4405b132ff97816d81e9
 https://d1o5wc5bjvzqoa.cloudfront.net/out/v1/bb744b243afb44eabcc56d002c36cafd/index.mpd
-#EXTINF:-1 tvg-id="htvkey" group-title="HTV" tvg-logo="https://i.imgur.com/pBdALZ1.png", HTV4 Key
-https://raw.githubusercontent.com/thcoban/thvn/main/htvkey.m3u8
-#EXTINF:-1 tvg-id="htvccanhachd" group-title="HTV" tvg-logo="https://vietanhtv.id.vn/logo/htvccanhac.png", HTVC Ca Nhạc
-#EXTVLCOPT:http-user-agent=Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0
-https://freem3u.xyz/api/live/play.m3u8?vid=14
 #EXTINF:-1 tvg-id="OnHomeShopping" group-title="VTVcab" tvg-logo="https://raw.githubusercontent.com/hieu-TQS/LOGO-IPTV/main/hom.png", On HomeShopping
 #EXTVLCOPT:http-user-agent=Dalvik/2.1.0
 #KODIPROP:inputstream.adaptive.manifest_type=mpd
